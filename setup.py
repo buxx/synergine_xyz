@@ -3,8 +3,9 @@ import synergine_xyz
 
 setup(
     name='synergine_xyz',
-    version='0.0.1.4',
+    version='0.0.1.5',
     packages=find_packages(),
+    install_requires=['synergine'],
     author='Bastien Sevajol',
     author_email="synergine@bux.fr",
     description='Synergy 2d and 3d library',
