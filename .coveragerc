@@ -1,0 +1,10 @@
+[run]
+omit =
+    */tests*
+    run_tests.py
+    run.py
+    setup.py
+[report]
+exclude_lines =
+    raise NotImplementedError
+    if __name__ == .__main__.:
