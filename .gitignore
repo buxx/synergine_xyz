@@ -1,0 +1,11 @@
+*~
+*.pyc
+*.komodoproject
+nbproject
+.idea
+.coverage
+sandbox
+/profile
+lsprofcalltree.py
+*.egg*
+build/
