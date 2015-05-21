@@ -3,7 +3,7 @@ import synergine_xyz
 
 setup(
     name='synergine_xyz',
-    version='0.0.1.5',
+    version='0.0.1.6',
     packages=find_packages(),
     install_requires=['synergine'],
     author='Bastien Sevajol',
