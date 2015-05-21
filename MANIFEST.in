@@ -1,0 +1,3 @@
+include *.md
+recursive-include synergine_lifegame *.jpg
+recursive-include synergine_lifegame *.png
