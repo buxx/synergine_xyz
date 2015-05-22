@@ -1,6 +1,7 @@
 [run]
 omit =
     */tests*
+    synergine/*
     run_tests.py
     run.py
     setup.py
