@@ -19,6 +19,7 @@ class Display(BaseDisplay):
         self._display_decal = (0, 0)
         self._grid = None
         self._zoom = 1
+        self._freeze = False
 
     def initialize(self):
         super().initialize()
@@ -38,6 +39,9 @@ class Display(BaseDisplay):
         # for object_to_display in synergy_object_manager.get_objects_to_display():
         #     if self._object_displayable(object_to_display):
         #         self._draw_object_with_decal(object_to_display)
+        if self._freeze:
+            return
+
         positions = self._context.metas.list.get_collection(POSITIONS)
         for position in positions:
             if self._position_displayable(position):

@@ -29,6 +29,9 @@ class PygameDisplay(XyDisplay):
         pass
 
     def start_of_cycle(self):
+        if self._freeze:
+            return
+
         screen_size = self._screen.get_size()
         if screen_size != self._screen_size:
             self._update_screen_size()
@@ -71,6 +74,11 @@ class PygameDisplay(XyDisplay):
                 elif event.key == pygame.K_z:
                     self._grid.set_cell_size(self._grid.get_cell_size()+5)
                     self._set_zoom(self.get_zoom()-20)
+                elif event.key == pygame.K_SPACE:
+                    if self._freeze:
+                        self._freeze = False
+                    else:
+                        self._freeze = True
                 else:
                     self._key_pressed(event.key)
 
