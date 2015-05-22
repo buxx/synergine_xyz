@@ -1,5 +1,5 @@
 filter:
-    excluded_paths: [synergine/*, synergine_xyz/*]
+    excluded_paths: [synergine/*]
 checks:
     python:
         format_bad_indentation:
