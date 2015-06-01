@@ -1,5 +1,4 @@
 from synergine_xyz.display.Display import Display as XyDisplay
-from synergine.synergy.object.SynergyObject import SynergyObject
 import curses
 
 
