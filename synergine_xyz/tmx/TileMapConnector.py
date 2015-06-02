@@ -9,9 +9,6 @@ class TileMapConnector:
     TODO: This class is on writing. Refactoring, split needed.
     """
 
-    _properties = ['simulation', 'collection', 'object']
-    """List of synergies object properties"""
-
     @classmethod
     def from_file(cls, file_name):
         """
@@ -30,61 +27,10 @@ class TileMapConnector:
         :return:
         """
         self._tile_map = tile_map
-        self._objects_definitions = self._get_objects_definitions()
-        # self._simulations_definitions = self._get_simulations_definitions()
-        # self._collections_definitions = self._get_collection_definitions()
-
-    def _get_objects_definitions(self):
-        objects = {}
-        for tile_set_position, tile_set in enumerate(self._tile_map.tilesets):
-            first_gid = tile_set.firstgid
-            for key, tile in enumerate(tile_set.tiles):
-                tile_id = first_gid + key
-                objects[tile_id] = self._get_tile_properties(tile, tile_set)
-                objects[tile_id]['tile_set'] = tile_set_position
-        return objects
-
-    def _get_tile_properties(self, tile, tile_set):
-        properties = {}
-
-        for property in self._properties:
-            properties[property] = self._get_tile_property(property, tile, tile_set)
-
-        properties['actions'] = self._get_node_actions(tile)
-        properties['position'] = tile.id
-
-        return properties
-
-    def _get_tile_property(self, name, tile, tile_set):
-        # Get tile property
-        try:
-            return self._get_property(name, tile)
-        except NotFound:
-            # If not, search in tile_set
-            return self._get_property(name, tile_set)
-
-    @staticmethod
-    def _get_property(name, node):
-        for node_property in node.properties:
-            if name == node_property.name and node_property.value:
-                return node_property.value
-        raise NotFound('"%s" property not found' % name)
-
-    def _get_node_actions(self, node):
-        actions = []
-        for node_property in node.properties:
-            if 'actions' == node_property.name and node_property.value:
-                actions = [action.strip() for action in node_property.value.split(',')]
-
-        return actions
-
-    # def _get_simulations_definitions(self):
-    #     simulations_definition = {}
-    #     for object_definition in self._objects_definitions:
-
 
     def create_simulations(self, config):
         simulation = {}
+        objects_definitions = self._tile_map.get_objects_definitions()
 
         width = self._tile_map.width
         height = self._tile_map.height
@@ -106,7 +52,7 @@ class TileMapConnector:
                 if tile.gid != 0:
 
                     # TODO: check and raise
-                    object_definition = dict(self._objects_definitions[tile.gid])
+                    object_definition = dict(objects_definitions[tile.gid])
                     object_definition['position'] = position
 
                     object_tile_set = object_definition['tile_set']
@@ -149,9 +95,10 @@ class TileMapConnector:
         :return: dict of {object_class: PIL.Image._ImageCrop, ...}
         """
         objects_images = {}
+        objects_definitions = self._tile_map.get_objects_definitions()
 
-        for obj_gid in self._objects_definitions:
-            object_definition = self._objects_definitions[obj_gid]
+        for obj_gid in objects_definitions:
+            object_definition = objects_definitions[obj_gid]
             object_tile_set = self._get_tile_set(object_definition['tile_set'])
             image = self._extract_image_from_tile_set(object_tile_set, object_definition['position'])
 
@@ -169,7 +116,8 @@ class TileMapConnector:
         x1, y1, x2, y2 = self._get_object_tile_position(tile_set, object_position)
         return tile_set_image.crop((x1, y1, x2, y2))
 
-    def _get_object_tile_position(self, tile_set, object_position):
+    @staticmethod
+    def _get_object_tile_position(tile_set, object_position):
         absolute_start_x = tile_set.tilewidth * object_position  # 20 * 5 = 100
         y_decal = absolute_start_x // int(tile_set.image.width)  # 100 / 60 = 1
         start_y = tile_set.tileheight * y_decal  # 20 * 1 = 20
