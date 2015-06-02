@@ -9,3 +9,4 @@ sandbox
 lsprofcalltree.py
 *.egg*
 build/
+dist/*
