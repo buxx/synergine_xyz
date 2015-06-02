@@ -1,27 +1,35 @@
-import unittest
 from os import getcwd
 from synergine.synergy.Simulation import Simulation
 from synergine.synergy.collection.SynergyCollection import SynergyCollection
-from synergine.synergy.object.SynergyObject import SynergyObject
+from synergine_xyz.SynergyObject import SynergyObject
+from synergine.test.TestSimulation import TestSimulation
 
 
-class AntObj:
+class AntObj(SynergyObject):
     pass
 
 
-class EggObj:
+class EggObj(SynergyObject):
     pass
 
 
-class RockObj:
+class RockObj(SynergyObject):
     pass
 
 
-class FoodObj:
+class FoodObj(SynergyObject):
     pass
 
 
-class TmxMap(unittest.TestCase):
+class AntCollection(SynergyCollection):
+    pass
+
+
+class EnvCollection(SynergyCollection):
+    pass
+
+
+class TmxMap(TestSimulation):
 
     _map_file_path = getcwd()+"/tests/tmx/src/map.tmx"
     _map_config = {
@@ -29,8 +37,8 @@ class TmxMap(unittest.TestCase):
             'base': Simulation
         },
         'collection': {
-            'ant': SynergyCollection,
-            'env': SynergyCollection
+            'ant': AntCollection,
+            'env': EnvCollection
         },
         'object': {
             'ant': AntObj,
