@@ -154,3 +154,13 @@ class Map(TileMap):
                     tiles_data.append(object_definition)
 
         return tiles_data
+
+    def get_tile_set(self, key):
+        """
+
+        Return a tmx.Tileset for given key
+
+        :param key:
+        :return: tmx.Tileset
+        """
+        return self.tilesets[key]

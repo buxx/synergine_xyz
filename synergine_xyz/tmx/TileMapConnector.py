@@ -30,6 +30,22 @@ class TileMapConnector:
         self._config = config
 
     def create_simulations(self):
+        """
+
+        Create simulation (with collections, configurations) from the map.
+
+        :return: Simulation objects
+        """
+        simulation_definition = self._get_simulation_definition()
+        return self._get_simulation_from_definition(simulation_definition)
+
+    def _get_simulation_definition(self):
+        """
+
+        Return definition of simulation from the map
+
+        :return: simulation definition
+        """
         simulation_definition = {}
         tiles = self._tile_map.get_tiles_data()
 
@@ -49,24 +65,52 @@ class TileMapConnector:
 
             simulation_definition[simulation_class][tile_set][collection_class].append(tile)
 
-        return self._get_simulation_from_definition(simulation_definition)
+        return simulation_definition
 
     def _get_simulation_class(self, simulation_name):
+        """
+
+        Return the simulation class for given simulation name from config
+
+        :param simulation_name:
+        :return: Simulation class
+        """
         if simulation_name not in self._config['simulation']:
             raise Exception('Unknown simulation %s' % simulation_name)
         return self._config['simulation'][simulation_name]
 
     def _get_collection_class(self, collection_name):
+        """
+
+        Return the collection class for given collection name from config
+
+        :param collection_name:
+        :return: Collection class
+        """
         if collection_name not in self._config['collection']:
             raise Exception('Unknown collection %s' % collection_name)
         return self._config['collection'][collection_name]
 
     def _get_object_class(self, object_name):
+        """
+
+        Return the synergy object class for given synergy object name from config
+
+        :param object_name:
+        :return: SynergyObject class
+        """
         if object_name not in self._config['object']:
             raise Exception('Unknown object %s' % object_name)
         return self._config['object'][object_name]
 
     def _get_simulation_from_definition(self, definition):
+        """
+
+        return simulation (with collections, configurations) from a simulation definition
+
+        :param definition:
+        :return:
+        """
         simulations = []
         for simulation_class in definition:
             collections_list = definition[simulation_class]
@@ -86,14 +130,17 @@ class TileMapConnector:
     def extract_objects_images(self):
         """
 
+        Return a dict with extracted image for each synergy object
+
         :return: dict of {object_class: PIL.Image._ImageCrop, ...}
+        :rtype: dict
         """
         objects_images = {}
         objects_definitions = self._tile_map.get_objects_definitions()
 
         for obj_gid in objects_definitions:
             object_definition = objects_definitions[obj_gid]
-            object_tile_set = self._get_tile_set(object_definition['tile_set'])
+            object_tile_set = self._tile_map.get_tile_set(object_definition['tile_set'])
             image = self._extract_image_from_tile_set(object_tile_set, object_definition['position'])
 
             obj_class = self._get_object_class(object_definition['object'])
@@ -102,16 +149,31 @@ class TileMapConnector:
 
         return objects_images
 
-    def _get_tile_set(self, key):
-        return self._tile_map.tilesets[key]
-
     def _extract_image_from_tile_set(self, tile_set, object_position):
+        """
+
+        Return PIL.Image._ImageCrop image of object position in tileset.
+
+        :param tile_set: tmx.Tileset where extract image
+        :param object_position: position of the image object wanted
+        :return: PIL.Image._ImageCrop image of object position
+        :rtype: PIL.Image._ImageCrop
+        """
         tile_set_image = Image.open(tile_set.image.source)
         x1, y1, x2, y2 = self._get_object_tile_position(tile_set, object_position)
         return tile_set_image.crop((x1, y1, x2, y2))
 
     @staticmethod
     def _get_object_tile_position(tile_set, object_position):
+        """
+
+        Return tuple of x1, y1, x2, y2 corresponding to position of object in tileset image.
+
+        :param tile_set: tmx.Tileset where extract positions
+        :param object_position: position of wanted object positions
+        :return: tuple of x1, y1, x2, y2 corresponding to position of object in tileset image
+        :rtype: tuple
+        """
         absolute_start_x = tile_set.tilewidth * object_position
         y_decal = absolute_start_x // int(tile_set.image.width)
         start_y = tile_set.tileheight * y_decal
