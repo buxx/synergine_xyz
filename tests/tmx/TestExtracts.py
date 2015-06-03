@@ -8,8 +8,8 @@ from tests.tmx.src.tiles_string import ant, egg, food, rock
 class TestExtracts(TmxMap):
 
     def test_objects_images(self):
-        tile_map_connector = TileMapConnector.from_file(self._map_file_path)
-        object_images = tile_map_connector.extract_objects_images(dict(self._map_config))
+        tile_map_connector = TileMapConnector.from_file(self._map_file_path, dict(self._map_config))
+        object_images = tile_map_connector.extract_objects_images()
 
         self.assertTrue(FoodObj in object_images)
         self.assertIsInstance(object_images[FoodObj], PIL.Image._ImageCrop)

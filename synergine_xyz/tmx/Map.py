@@ -7,6 +7,34 @@ class Map(TileMap):
     _properties = ['simulation', 'collection', 'object']
     """List of synergies object properties"""
 
+    def __init__(self):
+        super().__init__()
+        self._objects_definitions = {}
+
+    @classmethod
+    def load(cls, fname):
+        tile_map = super().load(fname)
+        tile_map.update_objects_definitions()
+        return tile_map
+
+    def update_objects_definitions(self):
+        self._load_objects_definitions()
+
+    def _load_objects_definitions(self):
+        """
+
+        Compute objects definitions (see get_objects_definitions)
+
+        :return:
+        """
+        self._objects_definitions = {}
+        for tile_set_position, tile_set in enumerate(self.tilesets):
+            first_gid = tile_set.firstgid
+            for key, tile in enumerate(tile_set.tiles):
+                tile_id = first_gid + key
+                self._objects_definitions[tile_id] = self._get_tile_properties(tile, tile_set)
+                self._objects_definitions[tile_id]['tile_set'] = tile_set_position
+
     def get_objects_definitions(self):
         """
 
@@ -24,15 +52,7 @@ class Map(TileMap):
 
         :return: dict of objects definitions
         """
-        objects_definitions = {}
-        for tile_set_position, tile_set in enumerate(self.tilesets):
-            first_gid = tile_set.firstgid
-            for key, tile in enumerate(tile_set.tiles):
-                tile_id = first_gid + key
-                objects_definitions[tile_id] = self._get_tile_properties(tile, tile_set)
-                objects_definitions[tile_id]['tile_set'] = tile_set_position
-        return objects_definitions
-
+        return self._objects_definitions
 
     def _get_tile_properties(self, tile, tile_set):
         """
@@ -107,3 +127,30 @@ class Map(TileMap):
                 actions = [action.strip() for action in node_property.value.split(',')]
 
         return actions
+
+    def get_tiles_data(self):
+        tiles_data = []
+        tile_set_width = self.width
+
+        current_x_position = -1
+        current_y_position = 0
+
+        for z, layer in enumerate(self.layers):  # z: to do in future ...
+            for tile in layer.tiles:
+
+                if current_x_position == tile_set_width-1:
+                    current_x_position = -1
+                    current_y_position += 1
+
+                current_x_position += 1
+
+                position = (0, current_x_position, current_y_position)
+
+                if tile.gid != 0:
+
+                    object_definition = dict(self._objects_definitions[tile.gid])
+                    object_definition['position'] = position
+
+                    tiles_data.append(object_definition)
+
+        return tiles_data

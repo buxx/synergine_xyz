@@ -7,10 +7,10 @@ class TestLoadMap(TmxMap):
 
     def _get_set_up_simulations(self):
         tile_map_connector = self._get_import()
-        return tile_map_connector.create_simulations(dict(self._map_config))
+        return tile_map_connector.create_simulations()
 
     def _get_import(self):
-        return TileMapConnector.from_file(self._map_file_path)
+        return TileMapConnector.from_file(self._map_file_path, dict(self._map_config))
 
     def test_import(self):
         self._get_import()

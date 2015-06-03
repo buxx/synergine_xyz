@@ -6,11 +6,11 @@ from PIL import Image
 
 class TileMapConnector:
     """
-    TODO: This class is on writing. Refactoring, split needed.
+    Load simulation from prepared TMX file.
     """
 
     @classmethod
-    def from_file(cls, file_name):
+    def from_file(cls, file_name, config):
         """
 
         Return TileMapConnector instance with file_name tmx map as reference.
@@ -18,69 +18,64 @@ class TileMapConnector:
         :param file_name:
         :return:
         """
-        return cls(Map.load(file_name))
+        return cls(Map.load(file_name), config)
 
-    def __init__(self, tile_map: Map):
+    def __init__(self, tile_map: Map, config):
         """
 
         :param tile_map: Map
         :return:
         """
         self._tile_map = tile_map
+        self._config = config
 
-    def create_simulations(self, config):
-        simulation = {}
-        objects_definitions = self._tile_map.get_objects_definitions()
+    def create_simulations(self):
+        simulation_definition = {}
+        tiles = self._tile_map.get_tiles_data()
 
-        width = self._tile_map.width
-        height = self._tile_map.height
+        for tile in tiles:
+            simulation_class = self._get_simulation_class(tile['simulation'])
+            collection_class = self._get_collection_class(tile['collection'])
+            tile_set = tile['tile_set']
 
-        current_x_position = -1
-        current_y_position = 0
+            if simulation_class not in simulation_definition:
+                simulation_definition[simulation_class] = {}
 
-        for z, layer in enumerate(self._tile_map.layers):
-            for tile in layer.tiles:
+            if tile_set not in simulation_definition[simulation_class]:
+                simulation_definition[simulation_class][tile_set] = {}
 
-                if current_x_position == width-1:
-                    current_x_position = -1
-                    current_y_position += 1
+            if collection_class not in simulation_definition[simulation_class][tile_set]:
+                simulation_definition[simulation_class][tile_set][collection_class] = []
 
-                current_x_position += 1
+            simulation_definition[simulation_class][tile_set][collection_class].append(tile)
 
-                position = (0, current_x_position, current_y_position)
+        return self._get_simulation_from_definition(simulation_definition)
 
-                if tile.gid != 0:
+    def _get_simulation_class(self, simulation_name):
+        if simulation_name not in self._config['simulation']:
+            raise Exception('Unknown simulation %s' % simulation_name)
+        return self._config['simulation'][simulation_name]
 
-                    # TODO: check and raise
-                    object_definition = dict(objects_definitions[tile.gid])
-                    object_definition['position'] = position
+    def _get_collection_class(self, collection_name):
+        if collection_name not in self._config['collection']:
+            raise Exception('Unknown collection %s' % collection_name)
+        return self._config['collection'][collection_name]
 
-                    object_tile_set = object_definition['tile_set']
+    def _get_object_class(self, object_name):
+        if object_name not in self._config['object']:
+            raise Exception('Unknown object %s' % object_name)
+        return self._config['object'][object_name]
 
-                    # TODO: Check and raise
-                    object_simulation_class = config['simulation'][object_definition['simulation']]
-                    if object_simulation_class not in simulation:
-                        simulation[object_simulation_class] = {}
-
-                    if object_tile_set not in simulation[object_simulation_class]:
-                        simulation[object_simulation_class][object_tile_set] = {}
-
-                    object_collection_class = config['collection'][object_definition['collection']]
-                    if object_collection_class not in simulation[object_simulation_class][object_tile_set]:
-                        simulation[object_simulation_class][object_tile_set][object_collection_class] = []
-
-                    simulation[object_simulation_class][object_tile_set][object_collection_class].append(
-                        object_definition)
-
+    def _get_simulation_from_definition(self, definition):
         simulations = []
-        for simulation_class in simulation:
-            collections_list = simulation[simulation_class]
+        for simulation_class in definition:
+            collections_list = definition[simulation_class]
             collections = []
             for collection_key in collections_list:
                 collections_definitions = collections_list[collection_key]
                 for collection_class in collections_definitions:
                     objects_definitions = collections_definitions[collection_class]
-                    map_collection_configuration = MapCollectionConfiguration(objects_definitions, config)
+                    map_collection_configuration = MapCollectionConfiguration(objects_definitions, dict(self._config))
                     collection = collection_class(map_collection_configuration)
                     collections.append(collection)
             simulation = simulation_class(collections)
@@ -88,10 +83,9 @@ class TileMapConnector:
 
         return simulations
 
-    def extract_objects_images(self, config):
+    def extract_objects_images(self):
         """
 
-        :param config:
         :return: dict of {object_class: PIL.Image._ImageCrop, ...}
         """
         objects_images = {}
@@ -102,7 +96,7 @@ class TileMapConnector:
             object_tile_set = self._get_tile_set(object_definition['tile_set'])
             image = self._extract_image_from_tile_set(object_tile_set, object_definition['position'])
 
-            obj_class = config['object'][object_definition['object']]
+            obj_class = self._get_object_class(object_definition['object'])
             if obj_class not in objects_images:
                 objects_images[obj_class] = image
 
@@ -118,8 +112,8 @@ class TileMapConnector:
 
     @staticmethod
     def _get_object_tile_position(tile_set, object_position):
-        absolute_start_x = tile_set.tilewidth * object_position  # 20 * 5 = 100
-        y_decal = absolute_start_x // int(tile_set.image.width)  # 100 / 60 = 1
-        start_y = tile_set.tileheight * y_decal  # 20 * 1 = 20
-        start_x = absolute_start_x % int(tile_set.image.width)  # 100 % 60 = 40
+        absolute_start_x = tile_set.tilewidth * object_position
+        y_decal = absolute_start_x // int(tile_set.image.width)
+        start_y = tile_set.tileheight * y_decal
+        start_x = absolute_start_x % int(tile_set.image.width)
         return int(start_x), int(start_y), int(start_x + tile_set.tilewidth), int(start_y + tile_set.tileheight)
