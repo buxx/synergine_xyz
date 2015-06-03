@@ -13,11 +13,24 @@ class Map(TileMap):
 
     @classmethod
     def load(cls, fname):
+        """
+
+        Return a Map with tmx fname loaded and ready to use.
+
+        :param fname:
+        :return:
+        """
         tile_map = super().load(fname)
         tile_map.update_objects_definitions()
         return tile_map
 
     def update_objects_definitions(self):
+        """
+
+        Update definition of tmx tiles objects
+
+        :return:
+        """
         self._load_objects_definitions()
 
     def _load_objects_definitions(self):
@@ -129,6 +142,12 @@ class Map(TileMap):
         return actions
 
     def get_tiles_data(self):
+        """
+
+        Return a dict with definition of synergies object in they simulation and collections.
+
+        :return: dict with definition of simulation
+        """
         tiles_data = []
         tile_set_width = self.width
 
