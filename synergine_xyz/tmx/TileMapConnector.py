@@ -1,5 +1,5 @@
+from synergine_xyz.tmx.DynamicClasses import DynamicClasses
 from synergine_xyz.tmx.Map import Map
-from synergine_xyz.exceptions import NoMatch, NotFound
 from synergine_xyz.tmx.MapCollectionConfiguration import MapCollectionConfiguration
 from PIL import Image
 
@@ -28,6 +28,7 @@ class TileMapConnector:
         """
         self._tile_map = tile_map
         self._config = config
+        self._dynamic_classes = DynamicClasses()
 
     def create_simulations(self):
         """
@@ -119,7 +120,9 @@ class TileMapConnector:
                 collections_definitions = collections_list[collection_key]
                 for collection_class in collections_definitions:
                     objects_definitions = collections_definitions[collection_class]
-                    map_collection_configuration = MapCollectionConfiguration(objects_definitions, dict(self._config))
+                    map_collection_configuration = MapCollectionConfiguration(objects_definitions,
+                                                                              dict(self._config),
+                                                                              self._dynamic_classes)
                     collection = collection_class(map_collection_configuration)
                     collections.append(collection)
             simulation = simulation_class(collections)
@@ -144,8 +147,10 @@ class TileMapConnector:
             image = self._extract_image_from_tile_set(object_tile_set, object_definition['position'])
 
             obj_class = self._get_object_class(object_definition['object'])
-            if obj_class not in objects_images:
-                objects_images[obj_class] = image
+            obj_tile_set_id = object_definition['tile_set']
+            production_class = self._dynamic_classes.get_production_class(obj_class, obj_tile_set_id)
+            if production_class not in objects_images:
+                objects_images[production_class] = image
 
         return objects_images
 

@@ -31,6 +31,9 @@ class EnvCollection(SynergyCollection):
 
 class TmxMap(TestSimulation):
 
+    def _get_set_up_simulations(self):
+        raise NotImplementedError()
+
     _map_file_path = getcwd()+"/tests/tmx/src/map.tmx"
     _map_config = {
         'simulation': {
