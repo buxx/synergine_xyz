@@ -4,7 +4,8 @@ from synergine_xyz.exceptions import NotFound
 
 class Map(TileMap):
 
-    _properties = ['simulation', 'collection', 'object']
+    _properties_required = ['simulation', 'collection', 'object']
+    _properties_optional = ['class']
     """List of synergies object properties"""
 
     def __init__(self):
@@ -84,8 +85,14 @@ class Map(TileMap):
         """
         properties = {}
 
-        for property in self._properties:
+        for property in self._properties_required:
             properties[property] = self._get_tile_property(property, tile, tile_set)
+
+        for property in self._properties_optional:
+            try:
+                properties[property] = self._get_tile_property(property, tile, tile_set)
+            except NotFound:
+                properties[property] = None
 
         properties['actions'] = self._get_node_actions(tile)
         properties['position'] = tile.id
@@ -183,3 +190,10 @@ class Map(TileMap):
         :return: tmx.Tileset
         """
         return self.tilesets[key]
+
+    def get_tile_position_with_class(self, tile_set_id, tile_class):
+        for object_gid in self._objects_definitions:
+            object_definition = self._objects_definitions[object_gid]
+            if object_definition['tile_set'] == tile_set_id and object_definition['class'] == tile_class:
+                return object_definition['position']
+        raise NotFound()

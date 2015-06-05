@@ -30,6 +30,9 @@ class TileMapConnector:
         self._config = config
         self._dynamic_classes = DynamicClasses()
 
+    def get_dynamic_classes(self):
+        return self._dynamic_classes
+
     def create_simulations(self):
         """
 
@@ -184,3 +187,15 @@ class TileMapConnector:
         start_y = tile_set.tileheight * y_decal
         start_x = absolute_start_x % int(tile_set.image.width)
         return int(start_x), int(start_y), int(start_x + tile_set.tilewidth), int(start_y + tile_set.tileheight)
+
+    def add_object_callback_to_visualisation(self, visualizer, objects_classes, dead_ant_callback_container):
+        for object_class in objects_classes:
+            objects_production_classes = self._dynamic_classes.get_production_classes(object_class)
+            for object_production_class in objects_production_classes:
+                callback = dead_ant_callback_container(object_production_class)
+                visualizer.add_callback(object_production_class, callback)
+
+    def extract_image_with_class(self, tile_set_id, tile_class):
+        class_tile_position = self._tile_map.get_tile_position_with_class(tile_set_id, tile_class)
+        tile_set = self._tile_map.get_tile_set(tile_set_id)
+        return self._extract_image_from_tile_set(tile_set, class_tile_position)

@@ -25,8 +25,6 @@ class PygameVisualisation(BaseVisualisation):
         pygame_surface = pygame.image.fromstring(image_bytes, pil_image.size, pil_image.mode)
         pygame_image = PygameImage(pygame_surface)
         self._visualisation_config['objects'][object_class]['default'] = pygame_image
-        if self._is_oriented_object(object_class):
-            self._add_oriented_callback(object_class)
 
     def _is_oriented_object(self, object_class):
         for oriented_object_class in self._oriented_objects:
@@ -55,3 +53,11 @@ class PygameVisualisation(BaseVisualisation):
             previous_direction = 14
         directionned_image = self._oriented_images[object_class]
         return directionned_image.get_for_direction(previous_direction)
+
+    def add_callback(self, object_class, callback):
+        self._visualisation_config['objects'][object_class]['callbacks'].append(callback)
+
+    def add_oriented_callbacks(self):
+        for object_class in self._visualisation_config['objects']:
+            if self._is_oriented_object(object_class):
+                self._add_oriented_callback(object_class)
