@@ -188,11 +188,11 @@ class TileMapConnector:
         start_x = absolute_start_x % int(tile_set.image.width)
         return int(start_x), int(start_y), int(start_x + tile_set.tilewidth), int(start_y + tile_set.tileheight)
 
-    def add_object_callback_to_visualisation(self, visualizer, objects_classes, dead_ant_callback_container):
+    def add_object_callback_to_visualisation(self, visualizer, objects_classes, callback_container):
         for object_class in objects_classes:
             objects_production_classes = self._dynamic_classes.get_production_classes(object_class)
             for object_production_class in objects_production_classes:
-                callback = dead_ant_callback_container(object_production_class)
+                callback = callback_container(self, object_production_class)
                 visualizer.add_callback(object_production_class, callback)
 
     def extract_image_with_class(self, tile_set_id, tile_class):
