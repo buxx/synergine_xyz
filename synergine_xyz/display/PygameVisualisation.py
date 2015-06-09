@@ -1,8 +1,6 @@
 import pygame
 from synergine.display.Visualisation import Visualisation as BaseVisualisation
 from synergine_xyz.display.object.pygame.PygameImage import PygameImage
-from synergine_xyz.display.object.pygame.DirectionnedImage import DirectionnedImage
-from synergine_xyz.cst import PREVIOUS_DIRECTION
 
 
 class PygameVisualisation(BaseVisualisation):
