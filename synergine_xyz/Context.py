@@ -44,7 +44,7 @@ class Context(BaseContext):
         return objects_ids_arounds_by_point
 
     # TODO: Ces methodes de points devrait etre ailleurs
-    def get_around_points_of(self, point, distance=1):
+    def get_around_points_of(self, point, distance=1, exclude_start_point = True):
         """
 
         Return positions around a point.
@@ -64,7 +64,8 @@ class Context(BaseContext):
                 #for dz in range(range_distance):
                     #points.append((start_z+dz, start_x+dx, start_y+dy))
                 points.append((0, start_x+dx, start_y+dy))
-        points.remove(point)
+        if exclude_start_point:
+            points.remove(point)
         return points
 
     def get_around_points_of_point(self, point):
