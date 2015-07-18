@@ -1,6 +1,9 @@
 from math import degrees, acos, sqrt
 
 def get_degree_from_north(a, b):
+    if a == b:
+        return 0
+
     ax, ay = a[1], a[2]
     bx, by = b[1], b[2]
     Dx, Dy = ax, ay-1
@@ -12,3 +15,7 @@ def get_degree_from_north(a, b):
     if bx < ax:
         return 360 - degs
     return degs
+
+
+def distance_from_points(a, b):
+    return abs(((a[1] - b[1]) + (a[2] - b[2]))/2)

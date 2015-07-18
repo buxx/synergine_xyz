@@ -17,7 +17,7 @@ class DistanceFromMechanism(Mechanism):
         raise NotImplementedError()
 
     def _get_distances_for_points(self, context, object_position, max_distance):
-        points_distances = {}
+        points_distances = {object_position: 0}
         points_to_looks = [object_position]
 
         for current_distance in range(max_distance):
