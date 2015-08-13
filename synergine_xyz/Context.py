@@ -68,7 +68,7 @@ class Context(BaseContext):
             points.remove(point)
         return points
 
-    def get_around_points_of_point(self, point):
+    def get_around_points_of_point(self, point, exclude_start_point=True):
         """
 
         Return positions around a point with distance of 1.
@@ -81,7 +81,7 @@ class Context(BaseContext):
         pz = pos[0]
         px = pos[1]
         py = pos[2]
-        return (
+        points = [
             (pz, px-1, py-1),
             (pz, px,     py-1),
             (pz, px+1, py+1),
@@ -90,5 +90,7 @@ class Context(BaseContext):
             (pz, px-1, py+1),
             (pz, px,     py+1),
             (pz, px+1, py-1)
-        )
-
+        ]
+        if not exclude_start_point:
+            points.append(point)
+        return points
