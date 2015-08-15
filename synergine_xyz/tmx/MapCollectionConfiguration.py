@@ -14,6 +14,7 @@ class MapCollectionConfiguration(Configuration):
         for object_definition in self._objects_definitions:
             obj = self._get_class(object_definition)(collection, context)
             obj.set_position(object_definition['position'])
+            self._apply_callbacks(obj, object_definition['callbacks'])
             objects.append(obj)
 
         return objects
@@ -23,6 +24,13 @@ class MapCollectionConfiguration(Configuration):
         object_class = self._config['object'][object_class_name]
         tile_set_id = object_definition['tile_set']
         return self._dynamic_classes.get_production_class(object_class, tile_set_id)
+
+    def _apply_callbacks(self, obj, callbacks_names):
+        for callback_name in callbacks_names:
+            if callback_name not in self._config['callbacks']:
+                raise Exception('Callback "%s" not found' % callback_name)
+            for real_callback in self._config['callbacks'][callback_name]:
+                real_callback(obj)
 
     def get_start_position(self):
         # TODO: Devra etre base sur element de la tilemap !

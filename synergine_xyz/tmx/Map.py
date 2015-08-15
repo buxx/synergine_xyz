@@ -95,6 +95,7 @@ class Map(TileMap):
                 properties[property] = None
 
         properties['actions'] = self._get_node_actions(tile)
+        properties['callbacks'] = self._get_node_callbacks(tile, tile_set)
         properties['position'] = tile.id
 
         return properties
@@ -149,6 +150,12 @@ class Map(TileMap):
                 actions = [action.strip() for action in node_property.value.split(',')]
 
         return actions
+
+    def _get_node_callbacks(self, tile, tile_set):
+        callbacks_string = self._get_tile_property('callbacks', tile, tile_set, required=False)
+        if not callbacks_string:
+            return []
+        return callbacks_string.split(',')
 
     def get_tiles_data(self):
         """
