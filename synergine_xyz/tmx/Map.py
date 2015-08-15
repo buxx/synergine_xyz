@@ -99,7 +99,7 @@ class Map(TileMap):
 
         return properties
 
-    def _get_tile_property(self, name, tile, tile_set):
+    def _get_tile_property(self, name, tile, tile_set, required=True, default=None):
         """
 
         Return tile property value. If property not found in tile, search in tile_set.
@@ -115,10 +115,10 @@ class Map(TileMap):
             return self._get_property(name, tile)
         except NotFound:
             # If not, search in tile_set
-            return self._get_property(name, tile_set)
+            return self._get_property(name, tile_set, required, default)
 
     @staticmethod
-    def _get_property(name, node):
+    def _get_property(name, node, required=True, default=None):
         """
 
         Return property value of tile
@@ -130,6 +130,8 @@ class Map(TileMap):
         for node_property in node.properties:
             if name == node_property.name and node_property.value:
                 return node_property.value
+        if not required:
+            return default
         raise NotFound('"%s" property not found' % name)
 
     def _get_node_actions(self, node):
