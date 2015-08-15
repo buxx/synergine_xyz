@@ -9,8 +9,8 @@ class SynergyObject(BaseSynergyObject):
 
     """
 
-    def __init__(self, collection, context, forced_id=None):
-        super().__init__(collection, context, forced_id)
+    def __init__(self, collection, context, from_id=None):
+        super().__init__(collection, context, from_id)
         self._position = None
         self._start_position = None
         self._previous_direction = None
